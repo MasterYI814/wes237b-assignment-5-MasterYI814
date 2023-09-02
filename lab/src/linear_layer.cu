@@ -13,6 +13,24 @@ __global__ void linearLayerForward(float *W, float* input, float* output, float*
 									const int input_rows, const int input_cols) 
 {
     //TODO: complete the linear layer forward propagation
+	int row = blockIdx.y * blockDim.y + threadIdx.y;
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
+
+    //Get dimension of the output 
+    int output_rows = W_rows;
+    int output_cols = input_cols;
+
+    float output_value = 0.0f;
+
+    if (col < output_cols && row < output_rows)
+    {
+        for (int i = 0; i < W_cols; i++)
+        {
+            output_value += W[row * W_cols + i] * input[i * input_cols + col];
+        }
+
+        output[row * output_cols + col] = output_value + b[row];
+    }
 }
 
 __global__ void linearLayerBackprop(float *W, float* eB, float* eA,

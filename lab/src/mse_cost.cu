@@ -8,11 +8,22 @@
 __global__ void meanSquaredErrorCost(float* predictions, float* target, const int size, float* cost)
 {
     //TODO: complete the cost calculation. (Hint: use atomicAdd() when accumulating)
+	int index = blockIdx.x * blockDim.x + threadIdx.x;
+	if (index < size)
+	{
+		float partial_cost = powf((predictions[index] - target[index]), 2.0f);
+        atomicAdd(cost, partial_cost/size);
+	}
 }
 
 __global__ void dMeanSquaredErrorCost(float* predictions, float* target, float* eA, const int size)
 {
     //TODO: complete the derivative of the mean squared error cost function
+	int index = blockIdx.x * blockDim.x + threadIdx.x;
+	if (index < size)
+	{
+		eA[index] = (predictions[index] - target[index]) * 2.0f;
+	}
 }
 
 float MSECost::cost(Matrix predictions, Matrix target)
